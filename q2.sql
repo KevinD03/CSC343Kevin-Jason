@@ -1,4 +1,4 @@
--- Months
+-- Lure them back
 
 -- You must not change the next 2 lines or the table definition.
 SET SEARCH_PATH TO uber, public;
@@ -6,8 +6,10 @@ drop table if exists q2 cascade;
 
 create table q2(
     client_id INTEGER,
-    email VARCHAR(30),
-    months INTEGER
+    name VARCHAR(45),
+    email VARCHAR(40),
+    billed INTEGER,
+    decline INTEGER 
 );
 
 -- Do this for each of the views that define your intermediate steps.  
