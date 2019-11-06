@@ -17,7 +17,7 @@ DROP VIEW IF EXISTS intermediate_step CASCADE;
 
 
 -- Define views for your intermediate steps here:
-
+Create VIEW as 
 
 -- Your query that answers the question goes below the "insert into" line:
 insert into q1
