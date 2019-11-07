@@ -5,9 +5,10 @@ SET SEARCH_PATH TO uber, public;
 drop table if exists q1 cascade;
 
 create table q1(
-    client_id INTEGER,
-    email VARCHAR(30),
-    months INTEGER
+    type VARCHAR(9),
+	number INTEGER,
+	early FLOAT,
+	late FLOAT
 );
 
 -- Do this for each of the views that define your intermediate steps.  

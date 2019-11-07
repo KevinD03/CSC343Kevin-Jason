@@ -1,13 +1,14 @@
--- Months
+-- Bigger and smaller spenders
 
 -- You must not change the next 2 lines or the table definition.
 SET SEARCH_PATH TO uber, public;
-drop table if exists q1 cascade;
+drop table if exists q5 cascade;
 
-create table q1(
-    client_id INTEGER,
-    email VARCHAR(30),
-    months INTEGER
+create table q5(
+	client_id INTEGER,
+	months VARCHAR(7),      -- The handout called this "month", which made more sense.
+	total FLOAT,
+	comparison VARCHAR(30)  -- This could have been lower.
 );
 
 -- Do this for each of the views that define your intermediate steps.  
@@ -20,4 +21,4 @@ DROP VIEW IF EXISTS intermediate_step CASCADE;
 
 
 -- Your query that answers the question goes below the "insert into" line:
-insert into q1
+insert into q5

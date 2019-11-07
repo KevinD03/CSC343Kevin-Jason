@@ -6,10 +6,10 @@ drop table if exists q2 cascade;
 
 create table q2(
     client_id INTEGER,
-    name VARCHAR(45),
-    email VARCHAR(40),
-    billed INTEGER,
-    decline INTEGER 
+    name VARCHAR(41),
+    email VARCHAR(30),
+    billed FLOAT,
+    decline INTEGER
 );
 
 -- Do this for each of the views that define your intermediate steps.  
@@ -73,6 +73,7 @@ Where ClientOneToTenIn2014.rides < ClientNumIn2015.rides;
 
 
 -- Your query that answers the question goes below the "insert into" line:
+
 --insert into q2
 Select clinet_id, 
 concat(firstnamel, ' ', surname) as name, 	
@@ -85,5 +86,3 @@ Where wanted_client.clinet_id = num_2015.client_id and
 wanted_client.clinet_id = num_2014.client_id and 
 num_2015.client_id = num_2014.client_id
 Group by clinet_id;
-
-
