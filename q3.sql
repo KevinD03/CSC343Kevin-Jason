@@ -4,20 +4,45 @@
 SET SEARCH_PATH TO uber, public;
 drop table if exists q1 cascade;
 
-create table q1(
-    client_id INTEGER,
-    email VARCHAR(30),
-    months INTEGER
+create table q3(
+    driver integer,
+    start date,
+    driving interval,
+    breaks interval
 );
 
 -- Do this for each of the views that define your intermediate steps.  
 -- (But give them better names!) The IF EXISTS avoids generating an error 
 -- the first time this file is imported.
-DROP VIEW IF EXISTS intermediate_step CASCADE;
-
+DROP VIEW IF EXISTS DirverWorkWithTime CASCADE;
+DROP VIEW IF EXISTS DirverWorkTimePerDay CASCADE;
+DROP VIEW IF EXISTS DirverBreakSumPerDay CASCADE;
+DROP VIEW IF EXISTS DriverWorkMoreThree CASCADE;
+DROP VIEW IF EXISTS BreakTimeInThreeDay CASCADE;
+DROP VIEW IF EXISTS DriveBreakLaw CASCADE;
 
 -- Define views for your intermediate steps here:
+CREATE VIEW DirverWorkWithTime as
+Select Dispatch.request_id, driver_id, 
+to_char(Pickup.datetime, 'YYYY-MM-DD') as pickuptime,
+sum(Dropoff.datetime - Pickup.datetime) as worktime
+From Dispatch, Dropoff, Pickup
+Where Dispatch.request_id = Pickup.request_id and 
+Pickup.request_id = Dropoff.request_id
+Group by Dispatch.request_id, driver_id, pickuptime;
 
+Select * from DirverWorkWithTime;
+
+--CREATE VIEW DirverBreakSumPerDay as
+
+
+--CREATE VIEW DriverWorkMoreThree as
+
+
+--CREATE VIEW BreakTimeInThreeDay as
+
+
+--CREATE VIEW DriveBreakLaw as 
 
 -- Your query that answers the question goes below the "insert into" line:
-insert into q1
+--insert into q3
