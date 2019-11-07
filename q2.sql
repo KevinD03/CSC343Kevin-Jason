@@ -6,10 +6,10 @@ drop table if exists q2 cascade;
 
 create table q2(
     client_id INTEGER,
-    name VARCHAR(45),
-    email VARCHAR(40),
-    billed INTEGER,
-    decline INTEGER 
+    name VARCHAR(41),
+    email VARCHAR(30),
+    billed FLOAT,
+    decline INTEGER
 );
 
 -- Do this for each of the views that define your intermediate steps.  

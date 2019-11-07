@@ -5,10 +5,10 @@ SET SEARCH_PATH TO uber, public;
 drop table if exists q1 cascade;
 
 create table q3(
-    driver integer,
-    start date,
-    driving interval,
-    breaks interval
+    driver_id INTEGER,
+    start DATE,
+    driving INTERVAL,
+    breaks INTERVAL
 );
 
 -- Do this for each of the views that define your intermediate steps.  
