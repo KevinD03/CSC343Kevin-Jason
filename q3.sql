@@ -22,7 +22,7 @@ DROP VIEW IF EXISTS BreakTimeInThreeDay CASCADE;
 DROP VIEW IF EXISTS DriveBreakLaw CASCADE;
 
 -- Define views for your intermediate steps here:
-CREATE VIEW DirverWorkWithTime as
+CREATE VIEW DirverWorkTimePerDay as
 Select Dispatch.request_id, driver_id, 
 to_char(Pickup.datetime, 'YYYY-MM-DD') as pickuptime,
 sum(Dropoff.datetime - Pickup.datetime) as worktime
@@ -31,9 +31,22 @@ Where Dispatch.request_id = Pickup.request_id and
 Pickup.request_id = Dropoff.request_id
 Group by Dispatch.request_id, driver_id, pickuptime;
 
-Select * from DirverWorkWithTime;
 
---CREATE VIEW DirverBreakSumPerDay as
+CREATE VIEW DirverBreakSumPerDay as
+Select Dispatch.request_id, driver_id, 
+sum(Pickup.datetime - Dropoff.datetime) as break
+From Dropoff, Pickup
+Where Pickup.request_id != Dropoff.request_id and
+Dropoff.datetime < Pickup.datetime
+Group by Dispatch.request_id, driver_id;
+
+Select * from DirverBreakSumPerDay;
+
+
+
+
+CREATE VIEW DriverOneTripPerDay as
+
 
 
 --CREATE VIEW DriverWorkMoreThree as
