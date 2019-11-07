@@ -65,5 +65,6 @@ CREATE VIEW ClientFewerRideIn2015 as
 
 -- Your query that answers the question goes below the "insert into" line:
 insert into q2
-Select * From Result;
-
+Select client_id, concat(firstname, ' ', surname), coalesce(email, 'unknow'), billed, ClientOneToTenIn2014.rides - as decline
+From ClientFewerRideIn2015, ClientOneToTenIn2014, ClientNumIn2015
+;
