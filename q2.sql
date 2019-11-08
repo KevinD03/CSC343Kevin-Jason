@@ -8,8 +8,8 @@ create table q2(
     client_id INTEGER,
     name VARCHAR(41),
     email VARCHAR(30),
-    billed FLOAT,
-    decline INTEGER
+    billed INTEGER,
+    decline INTEGER 
 );
 
 -- Do this for each of the views that define your intermediate steps.  
@@ -17,7 +17,7 @@ create table q2(
 -- the first time this file is imported.
 DROP VIEW IF EXISTS TotalBillBefore2014 CASCADE;
 DROP VIEW IF EXISTS ClientBefore2014AtLeast500 CASCADE;
-DROP VIEW IF EXISTS ClientNumIn2014 CASCADE;
+DROP VIEW IF EXISTS ClientRideNum CASCADE;
 DROP VIEW IF EXISTS ClientOneToTenIn2014 CASCADE;
 DROP VIEW IF EXISTS ClientNumIn2015 CASCADE;
 DROP VIEW IF EXISTS ClientFewerRideIn2015 CASCADE;
@@ -28,61 +28,76 @@ Select Client.client_id, surname, firstname, email, sum(amount) as billed
 From Client, ((Billed Left Join Dropoff 
         on Billed.request_id = Dropoff.request_id) 
         Left Join Request 
-        on Billed.request_id = Request.request_id) as Successful_Bill
-Where Client.client_id = Successful_Bill.client_id 
-and date_part('yy', Request.datetime) < 2014
+        on Billed.request_id = Request.request_id)
+Where Client.client_id = Request.client_id 
+and date_part('year', Request.datetime) < 2014
 Group by Client.client_id;
 
-Select * from TotalBillBefore2014;
 
 CREATE VIEW ClientBefore2014AtLeast500 as
 Select client_id, surname, firstname, email, billed
 From TotalBillBefore2014
 Where billed >= 500;
 
+Select * from ClientBefore2014AtLeast500;
 
-CREATE VIEW ClientNumIn2014 as
-Select Client.client_id, surname, firstname, email, billed, 
-count(CLient.client_id) as rides
-From ClientBefore2014AtLeast500 as Client, 
-(Request Join Dropoff on Requset.request_id = Dropoff.request_id) as Ride 
-Where ClientBefore2014AtLeast500.client_id = Ride.client_id
-Group by Client.client_id;
+
+CREATE VIEW ClientRideNum as
+Select ClientBefore2014AtLeast500.client_id, 
+count(ClientBefore2014AtLeast500.client_id) as rides
+From ClientBefore2014AtLeast500, Request, Dropoff
+Where ClientBefore2014AtLeast500.client_id = Request.client_id and
+Dropoff.request_id = Request.request_id and
+date_part('year', Request.datetime) = 2014
+Group by ClientBefore2014AtLeast500.client_id;
+
+Select * from ClientRideNum;
 
 
 CREATE VIEW ClientOneToTenIn2014 as
-Select client_id, surname, firstname, email, billed, rides
-From ClientNumIn2014
+Select client_id, rides
+From ClientRideNum
 Where rides > 0 and rides < 11;
+
+Select * from ClientOneToTenIn2014;
 
 
 CREATE VIEW ClientNumIn2015 as
-Select Client.client_id, surname, firstname, email, billed, 
-count(CLient.client_id) as rides
-From ClientOneToTenIn2014 as Client, 
-    (Request Join Dropoff on Requset.request_id = Dropoff.requset_id) as Ride 
-Where ClientOneToTenIn2014.client_id = Ride.client_id
-Group by Client.client_id;
+Select ClientRideNum.client_id,
+count(ClientRideNum.client_id) as rides
+From ClientRideNum, Request, Dropoff
+Where ClientRideNum.client_id = Request.client_id and 
+Dropoff.request_id = Request.request_id and 
+date_part('year', Request.datetime) = 2015
+Group by ClientRideNum.client_id;
+
+
+Select * from ClientNumIn2015;
 
 
 CREATE VIEW ClientFewerRideIn2015 as
-Select client_id, surname, firstname, email, billed, rides
-From ClientOneToTenIn2014 Join ClientNumIn2015 
-    on ClientOneToTenIn2014.client_id = ClientNumIn2015.client_id
-Where ClientOneToTenIn2014.rides < ClientNumIn2015.rides;
+Select C.client_id
+From ClientOneToTenIn2014 C ,ClientNumIn2015 
+Where C.client_id = ClientNumIn2015.client_id and
+C.rides > ClientNumIn2015.rides;
 
+Select * from ClientFewerRideIn2015;
 
+CREATE VIEW Merge as 
+Select ClientFewerRideIn2015.client_id, surname, firstname, email, billed
+From ClientFewerRideIn2015,TotalBillBefore2014
+Where ClientFewerRideIn2015.client_id = TotalBillBefore2014.client_id;
+
+Select * From Merge; 
 -- Your query that answers the question goes below the "insert into" line:
-
 --insert into q2
-Select clinet_id, 
-concat(firstnamel, ' ', surname) as name, 	
-COALESCE(email, 'unknown'), 
-billed, 
+Select Merge.client_id, 
+concat(firstname, ' ', surname), 
+coalesce(email, 'unknown'), 
+billed,
 (ClientOneToTenIn2014.rides - ClientNumIn2015.rides) as decline
-From ClientFewerRideIn2015 as wanted_client, 
-ClientNumIn2015 as num_2015, ClientOneToTenIn2014 as num_2014
-Where wanted_client.clinet_id = num_2015.client_id and
-wanted_client.clinet_id = num_2014.client_id and 
-num_2015.client_id = num_2014.client_id
-Group by clinet_id;
+From Merge, ClientNumIn2015,ClientOneToTenIn2014
+Where Merge.client_id = ClientNumIn2015.client_id and
+ClientNumIn2015.client_id = ClientOneToTenIn2014.client_id;
+
+
