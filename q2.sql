@@ -92,8 +92,8 @@ Select * From Merge;
 -- Your query that answers the question goes below the "insert into" line:
 --insert into q2
 Select Merge.client_id, 
-concat(firstname, ' ', surname), 
-coalesce(email, 'unknown'), 
+concat(firstname, ' ', surname) as name, 
+coalesce(email, 'unknown') as email, 
 billed,
 (ClientOneToTenIn2014.rides - ClientNumIn2015.rides) as decline
 From Merge, ClientNumIn2015,ClientOneToTenIn2014
