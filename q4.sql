@@ -4,19 +4,11 @@
 SET SEARCH_PATH TO uber, public;
 drop table if exists q4 cascade;
 
-<<<<<<< HEAD
 create table q4(
     type VARCHAR(9),
     number INTEGER,
     early FLOAT,
     late FLOAT
-=======
-create table q1(
-    type VARCHAR(9),
-	number INTEGER,
-	early FLOAT,
-	late FLOAT
->>>>>>> 638d0ebea01c5ca9badcfbc86911baaa95626c0a
 );
 
 -- Do this for each of the views that define your intermediate steps.  
