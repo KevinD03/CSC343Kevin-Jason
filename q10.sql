@@ -19,63 +19,70 @@ create table q10(
 -- Do this for each of the views that define your intermediate steps.  
 -- (But give them better names!) The IF EXISTS avoids generating an error 
 -- the first time this file is imported.
-DROP VIEW IF EXISTS Mileage2014Source CASCADE;
-DROP VIEW IF EXISTS Mileage2014Destination CASCADE;
+DROP VIEW IF EXISTS Months CASCADE;
+DROP VIEW IF EXISTS DriverMonths CASCADE;
+DROP VIEW IF EXISTS P1 CASCADE;
+DROP VIEW IF EXISTS P2 CASCADE;
 DROP VIEW IF EXISTS Mileage2014 CASCADE;
-DROP VIEW IF EXISTS Mileage2015Format CASCADE;
-DROP VIEW IF EXISTS Mileage2015Source CASCADE;
-DROP VIEW IF EXISTS Mileage2015Destination CASCADE;
+DROP VIEW IF EXISTS Billings2014 CASCADE;
 DROP VIEW IF EXISTS Mileage2015 CASCADE;
-DROP VIEW IF EXISTS Mileage2015Format CASCADE;
-DROP VIEW IF EXISTS MileageFormat CASCADE;
+DROP VIEW IF EXISTS Billings2015 CASCADE;
+DROP VIEW IF EXISTS Final CASCADE;
+DROP VIEW IF EXISTS Result CASCADE;
 
 -- Define views for your intermediate steps here:
-CREATE VIEW Mileage2014Source AS
-SELECT Dropoff.request_id AS request_id, driver_id, to_char(Request.datetime, 'MM') as month_2014, Place.location as source
-FROM Dropoff JOIN Request ON Dropoff.request_id = Request.request_id JOIN Dispatch ON Dropoff.request_id = Dispatch.request_id JOIN place ON Request.source = place.name
-WHERE to_char(Request.datetime, 'YYYY') = '2014'; 
+CREATE VIEW Months as
+SELECT to_char(DATE '2014-01-01' + (interval '1' month * generate_series(0,11)), 'MM') as mo;
 
-CREATE VIEW Mileage2014Destination AS
-SELECT Dropoff.request_id AS request_id, driver_id, to_char(Request.datetime, 'MM') as month_2014, Place.location as destination
-FROM Dropoff JOIN Request ON Dropoff.request_id = Request.request_id JOIN Dispatch ON Dropoff.request_id = Dispatch.request_id JOIN place ON Request.destination = place.name
-WHERE to_char(Request.datetime, 'YYYY') = '2014';
+CREATE VIEW DriverMonths as
+SELECT Driver.driver_id as driver_id, mo as month
+FROM Driver, Months;
+
+CREATE VIEW P1 AS
+SELECT * FROM Place;
+
+CREATE VIEW P2 AS
+SELECT * FROM Place;
 
 CREATE VIEW Mileage2014 AS
-SELECT source<@>destination as mileage, Mileage2014Source.request_id as request_id, Mileage2014Source.driver_id as driver_id, Mileage2014Source.month_2014 as month_2014
-FROM Mileage2014Source, Mileage2014Destination
-WHERE Mileage2014Source.request_id = Mileage2014Destination.request_id;
+SELECT driver_id, to_char(Request.datetime, 'MM') as month, sum(P1.location<@>P2.location) as mileage_2014
+FROM Dropoff JOIN Dispatch ON Dropoff.request_id = Dispatch.request_id JOIN Request ON Dropoff.request_id = Request.request_id JOIN P1 ON Request.source = P1.name JOIN P2 ON Request.destination = P2.name
+WHERE to_char(Request.datetime, 'YYYY') = '2014'
+GROUP BY driver_id, to_char(Request.datetime, 'MM');
 
-CREATE VIEW Mileage2014Format AS
-SELECT driver_id, month_2014 as month,sum(mileage) as mileage_2014 
-FROM Mileage2014
-GROUP BY driver_id, month_2014;
-
-CREATE VIEW Mileage2015Source AS
-SELECT Dropoff.request_id AS request_id, driver_id, to_char(Request.datetime, 'MM') as month_2015, Place.location as source
-FROM Dropoff JOIN Request ON Dropoff.request_id = Request.request_id JOIN Dispatch ON Dropoff.request_id = Dispatch.request_id JOIN place ON Request.source = place.name
-WHERE to_char(Request.datetime, 'YYYY') = '2015'; 
-
-CREATE VIEW Mileage2015Destination AS
-SELECT Dropoff.request_id AS request_id, driver_id, to_char(Request.datetime, 'MM') as month_2015, Place.location as destination
-FROM Dropoff JOIN Request ON Dropoff.request_id = Request.request_id JOIN Dispatch ON Dropoff.request_id = Dispatch.request_id JOIN place ON Request.destination = place.name
-WHERE to_char(Request.datetime, 'YYYY') = '2015';
+CREATE VIEW Billings2014 AS
+SELECT driver_id, to_char(Request.datetime, 'MM') as month, sum(amount) as billings_2014
+FROM Dropoff JOIN Dispatch ON Dropoff.request_id = Dispatch.request_id JOIN billed ON billed.request_id = Dropoff.request_id JOIN Request ON Dropoff.request_id = Request.request_id
+WHERE to_char(Request.datetime, 'YYYY') = '2014'
+GROUP BY driver_id, to_char(Request.datetime, 'MM');
 
 CREATE VIEW Mileage2015 AS
-SELECT source<@>destination as mileage, Mileage2015Source.request_id as request_id, Mileage2015Source.driver_id as driver_id, Mileage2015Source.month_2015 as month_2015
-FROM Mileage2015Source, Mileage2015Destination
-WHERE Mileage2015Source.request_id = Mileage2015Destination.request_id;
+SELECT driver_id, to_char(Request.datetime, 'MM') as month, sum(P1.location<@>P2.location) as mileage_2015
+FROM Dropoff JOIN Dispatch ON Dropoff.request_id = Dispatch.request_id JOIN Request ON Dropoff.request_id = Request.request_id JOIN P1 ON Request.source = P1.name JOIN P2 ON Request.destination = P2.name
+WHERE to_char(Request.datetime, 'YYYY') = '2015'
+GROUP BY driver_id, to_char(Request.datetime, 'MM');
 
-CREATE VIEW Mileage2015Format AS
-SELECT driver_id, month_2015 as month,sum(mileage) as mileage_2015 
-FROM Mileage2015
-GROUP BY driver_id, month_2015;
+CREATE VIEW Billings2015 AS
+SELECT driver_id, to_char(Request.datetime, 'MM') as month, sum(amount) as billings_2015
+FROM Dropoff JOIN Dispatch ON Dropoff.request_id = Dispatch.request_id JOIN billed ON billed.request_id = Dropoff.request_id JOIN Request ON Dropoff.request_id = Request.request_id
+WHERE to_char(Request.datetime, 'YYYY') = '2015'
+GROUP BY driver_id, to_char(Request.datetime, 'MM');
 
-CREATE VIEW MileageFormat AS
-SELECT *
-FROM Mileage2015Format FULL JOIN Mileage2014Format ON Mileage2015Format.driver_id = Mileage2014Format.driver_id AND Mileage2015Format.month = Mileage2014Format.month;
+CREATE VIEW Final AS
+SELECT DriverMonths.driver_id as driver_id, DriverMonths.month as month, mileage_2014, billings_2014, mileage_2015, billings_2015
+FROM DriverMonths LEFT JOIN Mileage2014 ON DriverMonths.driver_id = Mileage2014.driver_id and DriverMonths.month = Mileage2014.month LEFT JOIN Billings2014 ON DriverMonths.driver_id = Billings2014.driver_id and DriverMonths.month = Billings2014.month LEFT JOIN Billings2015 ON DriverMonths.driver_id = Billings2015.driver_id and DriverMonths.month = Billings2015.month LEFT JOIN Mileage2015 ON DriverMonths.driver_id = Mileage2015.driver_id and DriverMonths.month = Mileage2015.month;
 
-SELECT * FROM MileageFormat;
+CREATE VIEW Result AS
+SELECT driver_id, month, coalesce(sum(mileage_2014),0) as mileage_2014, coalesce(sum(billings_2014),0) as billings_2014, coalesce(sum(mileage_2015),0) as mileage_2015, coalesce(sum(billings_2015),0) as billings_2015, coalesce(sum(billings_2015) - sum(billings_2014),0) as billings_increase, coalesce(sum(mileage_2015) - sum(mileage_2014),0) as mileage_increase
+FROM Final
+GROUP BY driver_id, month;
 
 
 -- Your query that answers the question goes below the "insert into" line:
--- insert into q10
+insert into q10
+SELECT * FROM Result;
+
+
+
+
+
