@@ -39,7 +39,7 @@ Select client_id, surname, firstname, email, billed
 From TotalBillBefore2014
 Where billed >= 500;
 
-Select * from ClientBefore2014AtLeast500;
+--Select * from ClientBefore2014AtLeast500;
 
 
 CREATE VIEW ClientRideNum as
@@ -51,7 +51,7 @@ Dropoff.request_id = Request.request_id and
 date_part('year', Request.datetime) = 2014
 Group by ClientBefore2014AtLeast500.client_id;
 
-Select * from ClientRideNum;
+--Select * from ClientRideNum;
 
 
 CREATE VIEW ClientOneToTenIn2014 as
@@ -59,7 +59,7 @@ Select client_id, rides
 From ClientRideNum
 Where rides > 0 and rides < 11;
 
-Select * from ClientOneToTenIn2014;
+--Select * from ClientOneToTenIn2014;
 
 
 CREATE VIEW ClientNumIn2015 as
@@ -72,7 +72,7 @@ date_part('year', Request.datetime) = 2015
 Group by ClientRideNum.client_id;
 
 
-Select * from ClientNumIn2015;
+--Select * from ClientNumIn2015;
 
 
 CREATE VIEW ClientFewerRideIn2015 as
@@ -81,16 +81,18 @@ From ClientOneToTenIn2014 C ,ClientNumIn2015
 Where C.client_id = ClientNumIn2015.client_id and
 C.rides > ClientNumIn2015.rides;
 
-Select * from ClientFewerRideIn2015;
+--Select * from ClientFewerRideIn2015;
 
 CREATE VIEW Merge as 
 Select ClientFewerRideIn2015.client_id, surname, firstname, email, billed
 From ClientFewerRideIn2015,TotalBillBefore2014
 Where ClientFewerRideIn2015.client_id = TotalBillBefore2014.client_id;
 
-Select * From Merge; 
+--Select * From Merge; 
+
+
 -- Your query that answers the question goes below the "insert into" line:
---insert into q2
+insert into q2
 Select Merge.client_id, 
 concat(firstname, ' ', surname) as name, 
 coalesce(email, 'unknown') as email, 
