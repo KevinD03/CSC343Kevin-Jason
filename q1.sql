@@ -29,7 +29,7 @@ From Client Left Join Rides on Client.client_id = Rides.client_id;
 
 
 -- Your query that answers the question goes below the "insert into" line:
-insert into q1
+--insert into q1
 Select client_id, email, count(distinct datetime) as months
 From ClientWithRides
 Group by client_id, email;
