@@ -28,12 +28,11 @@ public class Assignment2 {
    * @param  password  the password to connect to the database
    * @return           true if connecting is successful, false otherwise
    */
-   public connectDB(String URL, String username, String password) {
+   public boolean connectDB(String URL, String username, String password) {
       // Implement this method!
       try { 
-      	connection = DriverManager.getConnection(url, username, password);
-      	prepareStatement setPath = 
-      		connection.prepareStatement("SET SEARCH_PATH TO uber, public");
+      	connection = DriverManager.getConnection(URL, username, password);
+      	PreparedStatement setPath = connection.prepareStatement("SET SEARCH_PATH TO uber, public");
       	setPath.execute();
       	return true;
       } catch (SQLException se) {
@@ -52,7 +51,7 @@ public class Assignment2 {
       try {
       	connection.close();
       	return true;
-      } catch (SQLExecption se) {
+      } catch (SQLException se) {
       	System.err.println("SQL Exception. " + "<Message>: " + se.getMessage());
       }
       return false;
@@ -75,7 +74,7 @@ public class Assignment2 {
    public boolean available(int driverID, Timestamp when, PGpoint location) {
       // Implement this method!
       try {
-      	String quaryString = "INSERT INTO Available " + 
+      	String queryString = "INSERT INTO Available " + 
       		"(driver_id, datetime, location) " + 
       		"VALUES (?, ?, ?);";
       	PreparedStatement ps = connection.prepareStatement(queryString);
@@ -83,7 +82,7 @@ public class Assignment2 {
       	ps.setTimestamp(2, when);
       	ps.setObject(3, location);
       	ps.execute();
-      } catch {
+      } catch (SQLException se){
       	System.err.println("SQL Exception. " + "<Message>: " + se.getMessage());
       	return false;
       }
