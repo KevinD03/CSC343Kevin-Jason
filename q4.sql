@@ -42,13 +42,13 @@ DriverRating.request_id = Dropoff.request_id;
 CREATE VIEW FirstFiveDayAverage AS
 SELECT driver_id, avg(rating) as first_five_average
 FROM DriverTenDays NATURAL JOIN DriverTenDaysDateRate
-WHERE datetime - firstday < interval '5 day'
+WHERE datetime - firstday < interval '5 day' and datetime >= firstday
 GROUP BY driver_id;
 
 CREATE VIEW LastFiveDayAverage AS
 SELECT driver_id, avg(rating) as last_five_average
 FROM DriverTenDays NATURAL JOIN DriverTenDaysDateRate
-WHERE  lastday - datetime < interval '5 day'
+WHERE  datetime - firstday >= interval '5 day'
 GROUP BY driver_id;
 
 CREATE VIEW FirstAndLastFiveDayAverageTrain AS
