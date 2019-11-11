@@ -32,7 +32,8 @@ public class Assignment2 {
       // Implement this method!
       try { 
       	connection = DriverManager.getConnection(URL, username, password);
-      	PreparedStatement setPath = connection.prepareStatement("SET SEARCH_PATH TO uber, public");
+      	PreparedStatement setPath = 
+      	        connection.prepareStatement("SET SEARCH_PATH TO uber, public");
       	setPath.execute();
       	return true;
       } catch (SQLException se) {
@@ -103,8 +104,35 @@ public class Assignment2 {
     */
    public boolean picked_up(int driverID, int clientID, Timestamp when) {
       // Implement this method!
-      
-      return false;
+      try {
+      	String queryString = "Select Request.request_id " + 
+      		"From Request, Dispatch, Pickup" + 
+      		"Where Request.request_id = Dispatch.request_id and "
+      		+ "Dispatch.request_id = Requset.request_id and "
+      		+ "Dispatch.driver_id = ? and "
+      		+ "Request.client_id = ? and "
+      		+ "Pickup.datetime = ?;";
+      	PreparedStatement ps = connection.prepareStatement(queryString);
+      	ps.setInt(1, driverID);
+      	ps.setInt(2, clientID);
+      	ps.setTimestamp(3, when);
+      	ResultSet rs = ps.executeQuery();
+      	while (rs.next()) {
+      	    int request_id = rs.getInt("request_id");
+      	    String insertString = "INSERT INTO Pickup " + 
+          		"(requset_id, datetime) " + 
+          		"VALUES (?, ?);";
+      	    PreparedStatement is = connection.prepareStatement(insertString);
+      	    is.setInt(1, request_id);
+      	    is.setTimestamp(2, when);
+      	    is.executeUpdate();
+      	    rs = is.executeQuery();
+      	}
+      } catch (SQLException se){
+      	System.err.println("SQL Exception. " + "<Message>: " + se.getMessage());
+      	return false;
+      }
+      return true;
    }
    
    /* ===================== Dispatcher-related methods ===================== */
@@ -268,10 +296,35 @@ public class Assignment2 {
       	System.err.println("SQL Exception." + "<Message>:" + se.getMessage());
       }
    }
+   
+   public void Print() {
+        try {
+            String queryString = "Select * From Request"; 		
+          	PreparedStatement ps = connection.prepareStatement(queryString);
+          	ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                int request = rs.getInt("request_id");
+                System.out.println(request);
+            }
+      } catch (SQLException se){
+      	    System.err.println("SQL Exception. " + 
+                "<Message>: " + se.getMessage());
+      }
+   }
 
    public static void main(String[] args) {
       // You can put testing code in here. It will not affect our autotester.
+      String url;
+      try {
+        Assignment2 test = new Assignment2();
+        url = "jdbc:postgresql://localhost:5432/csc343h-dingxuya";
+        System.out.println("connection: " + test.connectDB(url, "dingxuya", ""));
+        test.Print();
+        test.disconnectDB();
+      } catch (SQLException se){
+      	    System.err.println("SQL Exception. " + 
+                "<Message>: " + se.getMessage());
+      }
       System.out.println("Boo!");
    }
-
 }

@@ -29,7 +29,7 @@ Select Request.request_id,
 to_char(Request.datetime,'YYYY-MM') as datetime, amount
 From Request left join Billed on Request.request_id = Billed.request_id;
 
---Select * from RequestWithBill;
+Select * from RequestWithBill;
 
 CREATE VIEW RequsetWithAllBill as
 Select Request.client_id, Request.request_id, 
@@ -37,7 +37,7 @@ to_char(Request.datetime,'YYYY-MM') as datetime, amount
 From Request,RequestWithBill
 Where Request.request_id = RequestWithBill.request_id;
 
---Select * from RequsetWithAllBill;
+Select * from RequsetWithAllBill;
 
 
 CREATE VIEW MonthAverage as
@@ -47,7 +47,7 @@ From Request, Billed
 Where Request.request_id = Billed.request_id
 Group by Request.client_id,datetime;
 
---Select * from MonthAverage;
+Select * from MonthAverage;
 
 
 CREATE VIEW ClientAndMonth as
@@ -56,7 +56,7 @@ to_char(Request.datetime,'YYYY-MM') as datetime
 From Client, Request
 Order by Client.client_id;
 
---Select * from ClientAndMonth;
+Select * from ClientAndMonth;
 
 
 CREATE VIEW ClientMonthComb as 
@@ -64,7 +64,7 @@ Select client_id, datetime, count(request_id) as orders
 From ClientAndMonth
 Group by client_id,datetime;
 
---Select * from ClientMonthComb;
+Select * from ClientMonthComb;
 
 
 CREATE VIEW ClientMonthCheck as 
@@ -72,7 +72,7 @@ Select client_id, datetime
 From ClientMonthComb
 Order by client_id;
 
---Select * from ClientMonthCheck;
+Select * from ClientMonthCheck;
 
 
 CREATE VIEW ClientMonthBill as
@@ -84,7 +84,7 @@ ClientMonthCheck.datetime = RequsetWithAllBill.datetime
 Group by ClientMonthCheck.client_id, ClientMonthCheck.datetime
 Order By ClientMonthCheck.client_id;
 
---Select * from ClientMonthBill;
+Select * from ClientMonthBill;
 
 
 CREATE VIEW Report as 
@@ -101,5 +101,5 @@ where ClientMonthBill.datetime = MonthAverage.datetime;
 --Select * from Report;
 
 -- Your query that answers the question goes below the "insert into" line:
-insert into q5
+--insert into q5
 Select * from Report;

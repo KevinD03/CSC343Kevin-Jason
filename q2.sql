@@ -8,7 +8,7 @@ create table q2(
     client_id INTEGER,
     name VARCHAR(41),
     email VARCHAR(30),
-    billed INTEGER,
+    billed FLOAT,
     decline INTEGER 
 );
 
@@ -88,11 +88,11 @@ Select ClientFewerRideIn2015.client_id, surname, firstname, email, billed
 From ClientFewerRideIn2015,TotalBillBefore2014
 Where ClientFewerRideIn2015.client_id = TotalBillBefore2014.client_id;
 
---Select * From Merge; 
+Select * From Merge; 
 
 
 -- Your query that answers the question goes below the "insert into" line:
-insert into q2
+--insert into q2
 Select Merge.client_id, 
 concat(firstname, ' ', surname) as name, 
 coalesce(email, 'unknown') as email, 
