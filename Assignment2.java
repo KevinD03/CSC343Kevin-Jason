@@ -319,7 +319,7 @@ public class Assignment2 {
         Assignment2 A2 = new Assignment2();
         url = "jdbc:postgresql://localhost:5432/csc343h-dingxuya";
         System.out.println("connection: " + 
-        test.connectDB(url, "dingxuya", ""));
+        A2.connectDB(url, "dingxuya", ""));
         A2.Print();
         A2.disconnectDB();
       } catch (SQLException se){
