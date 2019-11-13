@@ -92,7 +92,7 @@ Select * From Merge;
 
 
 -- Your query that answers the question goes below the "insert into" line:
---insert into q2
+insert into q2
 Select Merge.client_id, 
 concat(firstname, ' ', surname) as name, 
 coalesce(email, 'unknown') as email, 
