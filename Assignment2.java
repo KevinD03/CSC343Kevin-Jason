@@ -177,18 +177,15 @@ public class Assignment2 {
 	      
 	      // Drivers who are really available
 	      String query0 =
-	      	"CREATE VIEW AvailableDrivers AS " +
-	      	"SELECT Driver.driver_id as driver_id, Available.location as location " + 
+	      	"SELECT Driver.driver_id as driver_id, " + 
+	      	"Available.location as location " + 
 	      	"FROM Driver, Available " +
 	      	"WHERE Driver.driver_id = Available.driver_id AND " +
 	      	"NOT EXISTS( " +
 	      	"SELECT * " +
 	      	"FROM Dispatch " +
 	      	"WHERE Dispatch.driver_id = Driver.driver_id AND " +
-	      	"Dispatch.datetime > Available.datetime) AND " +
-	      	"Available.location[0] < SEx AND Available.location[0] > NWx " +
-	      	"AND Available.location[1] < NWy AND Available.location[1] > " +
-	      	"SEy;";
+	      	"Dispatch.datetime > Available.datetime);";
 	      PreparedStatement stat = connection.prepareStatement(query0);     
 	      ResultSet worths0 = stat.executeQuery();
 	      System.out.println("Truly available drivers");
@@ -209,7 +206,8 @@ public class Assignment2 {
 	      String query2 =
 	      	"CREATE VIEW ClientBillings AS " +
 	      	"SELECT client_id, sum(amount) as billings " +
-	      	"FROM billed JOIN Request ON billed.request_id = Request.request_id " +
+	      	"FROM billed JOIN Request ON billed.request_id = " +
+	      	"Request.request_id " +
 	      	"GROUP BY client_id " +
 	      	"ORDER BY billings DESC;";
 	      stat = connection.prepareStatement(query2);
@@ -220,9 +218,12 @@ public class Assignment2 {
 	      ArrayList<PGpoint> driverlocation = new ArrayList<PGpoint>();
 	      
 	      while (worths0.next()) {
-	      	driverid.add(worths0.getInt("driver_id"));
+	      	
 	      	PGpoint pg = (PGpoint)worths0.getObject("location");
-	      	driverlocation.add(pg);
+	      	if (pg.x >= NWx && pg.x <= SEx && pg.y <= NWy && pg.y >= SEy) {
+	      		driverlocation.add(pg);
+	      		driverid.add(worths0.getInt("driver_id"));
+	      	}
 	      }
 	      
 	      // Client location
@@ -231,12 +232,9 @@ public class Assignment2 {
 	      	"ClientBillings.client_id as client_id, Place.location as " +
 	      	"location " +
 	      	"FROM ClientNotPickedUp, ClientBillings, Request, Place " +
-	      	"WHERE ClientNotPickedUP.request_id = Request.id AND " +
+	      	"WHERE ClientNotPickedUp.request_id = Request.request_id AND " +
 	      	"Request.client_id = ClientBillings.client_id AND " +
-	      	"Request.source = Place.name AND " +
-	      	"PLace.location[0] < SEx AND Place.location[0] > NWx " +
-	      	"AND Available.Place[1] < NWy AND Place.location[1] > " +
-	      	"SEy" +
+	      	"Request.source = Place.name " +
 	      	"ORDER BY billings DESC;";
 	      stat = connection.prepareStatement(query3);     
 	      ResultSet worths3 = stat.executeQuery();
@@ -248,9 +246,11 @@ public class Assignment2 {
 	      
 	      while (worths3.next()) {
 	      	PGpoint pg = (PGpoint) worths3.getObject("location");
-	      	clientlocation.add(pg);
-	      	requestid.add(worths3.getInt("request_id"));
-	      	clientid.add(worths3.getInt("client_id"));
+	      	if (pg.x >= NWx && pg.x <= SEx && pg.y <= NWy && pg.y >= SEy) {
+	      		clientlocation.add(pg);
+	      		requestid.add(worths3.getInt("request_id"));
+	      		clientid.add(worths3.getInt("client_id"));
+	      	}
 	      }
 	      
 	      ArrayList<Integer> dprequestid = new ArrayList<Integer>();
@@ -280,7 +280,7 @@ public class Assignment2 {
 	      	
 	      }
 	      for (int k = 0; k < dprequestid.size(); k++) {
-	      	String query4 = "INSERT INTO Dispatch (request_id, driver_id, " + 
+	      	String query4 = "INSERT INTO Dispatch (request_id, driver_id, "+ 
 	      	"car_location, datetime) " + "VALUES(?, ?, ?, ?);";
 	      	stat = connection.prepareStatement(query4);
 	      	stat.setInt(1, dprequestid.get(k));
@@ -316,11 +316,12 @@ public class Assignment2 {
       // You can put testing code in here. It will not affect our autotester.
       String url;
       try {
-        Assignment2 test = new Assignment2();
+        Assignment2 A2 = new Assignment2();
         url = "jdbc:postgresql://localhost:5432/csc343h-dingxuya";
-        System.out.println("connection: " + test.connectDB(url, "dingxuya", ""));
-        test.Print();
-        test.disconnectDB();
+        System.out.println("connection: " + 
+        test.connectDB(url, "dingxuya", ""));
+        A2.Print();
+        A2.disconnectDB();
       } catch (SQLException se){
       	    System.err.println("SQL Exception. " + 
                 "<Message>: " + se.getMessage());

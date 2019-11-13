@@ -6,11 +6,15 @@ insert into client values
 
 insert into driver values
 (12345, 'Snow', 'Jon', 'January 1, 1990', 'The Wall', 'BGSW 420', false),
-(22222, 'Tyrion', 'Lannister', 'January 1, 1990', 'Kings Landing', 'ABCD 123', false);
+(22222, 'Tyrion', 'Lannister', 'January 1, 1990', 'Kings Landing', 'ABCD 123', false),
+
+(22223, 'Jason', 'Lannister', 'January 1, 1991', 'Kings Landing', 'ABCD 124', false);
 
 
 insert into available values
-(12345, '2016-01-08 04:05', '(1, 2)');
+(12345, '2016-01-08 04:05', '(1, 2)'),
+
+(22223, '2016-02-15 08:15', '(4, 6)');
 
 
 -- Locations are specified as longitude and latitude (in that order), in degrees.
@@ -35,7 +39,10 @@ insert into request values
 (6, 100, '2014-07-02 08:00', 'pearson international airport', 'eaton centre'),
 (7, 100, '2014-07-03 08:00', 'eaton centre', 'cn tower'),
 -- 2015
-(8, 100, '2015-07-01 08:00', 'cn tower', 'pearson international airport');
+(8, 100, '2015-07-01 08:00', 'cn tower', 'pearson international airport'),
+
+(9, 100, '2017-08-01 08:00', 'cn tower', 'pearson international airport'),
+(10, 99, '2017-08-01 08:10', 'cn tower', 'pearson international airport');
 
 
 insert into dispatch values
