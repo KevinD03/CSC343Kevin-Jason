@@ -14,74 +14,91 @@ create table q3(
 -- Do this for each of the views that define your intermediate steps.  
 -- (But give them better names!) The IF EXISTS avoids generating an error 
 -- the first time this file is imported.
-DROP VIEW IF EXISTS DirverWorkWithTime CASCADE;
 DROP VIEW IF EXISTS DirverWorkTimePerDay CASCADE;
 DROP VIEW IF EXISTS DirverBreakPerDay CASCADE;
-DROP VIEW IF EXISTS DriverWorkMoreThree CASCADE;
-DROP VIEW IF EXISTS BreakTimeInThreeDay CASCADE;
-DROP VIEW IF EXISTS DriveBreakLaw CASCADE;
+DROP VIEW IF EXISTS OneTripBreak CASCADE;
+DROP VIEW IF EXISTS ActualBreakTime CASCADE;
+DROP VIEW IF EXISTS DriverBreakLawOneDay CASCADE;
+
 
 -- Define views for your intermediate steps here:
 CREATE VIEW DirverWorkTimePerDay as
 Select Dispatch.request_id, driver_id, 
 to_char(Pickup.datetime, 'YYYY-MM-DD') as pickuptime,
-sum(Dropoff.datetime - Pickup.datetime) as worktime
+sum(Dropoff.datetime::timestamp - Pickup.datetime::timestamp) as worktime
 From Dispatch, Dropoff, Pickup
 Where Dispatch.request_id = Pickup.request_id and 
-Pickup.request_id = Dropoff.request_id
+Pickup.request_id = Dropoff.request_id and 
+Dropoff.datetime::timestamp::date = Pickup.datetime::timestamp::date
 Group by Dispatch.request_id, driver_id, pickuptime;
 
-Select * from DirverWorkTimePerDay;
+--Select * from DirverWorkTimePerDay;
+
 
 CREATE VIEW DirverBreakPerDay as
 Select Dispatch.request_id, driver_id, 
-min(Pickup.datetime - Dropoff.datetime) as onebreak
-From Dropoff, Pickup, Dispatch
-Where Dispatch.request_id = Pickup.request_id and
-Pickup.request_id != Dropoff.request_id and
-Dropoff.datetime < Pickup.datetime
+sum(Pickup.datetime::timestamp - Dropoff.datetime::timestamp) as onebreak
+From Dropoff, Pickup, Dispatch, Request
+Where Request.request_id = Dispatch.request_id and
+Request.request_id = Pickup.request_id and
+Dropoff.datetime::timestamp::date = Pickup.datetime::timestamp::date and
+Dropoff.datetime::timestamp < Pickup.datetime::timestamp and 
+(Pickup.datetime::timestamp - 
+Dropoff.datetime::timestamp) < INTERVAL'00:15:00'
 Group by Dispatch.request_id, driver_id;
 
-Select * from DirverBreakPerDay;
+--Select * from DirverBreakPerDay;
 
 
-CREATE VIEW ActualBreakTime as 
-Select DirverBreakPerDay.request_id, driver_id, '00:00:00' as onebreak
-From DirverBreakPerDay, Dropoff, Pickup
-Where DirverBreakPerDay.request_id = Dropoff.request_id and
-Dropoff.request_id = Pickup.request_id
-Group by driver_id, DirverBreakPerDay.request_id,
-Having
-to_char(Pickup.datetime, 'YYYY-MM-DD') = to_char(Dropoff.datetime, 'YYYY-MM-DD')
-and count(Pickup.request_id) = count(Dropoff.request_id) 
-and count(Dropoff.request_id) = 1;
+CREATE VIEW OneTripBreak as 
+Select Dispatch.request_id, driver_id, interval'00:00:00' as onebreak
+From Request, Dropoff, Pickup, Dispatch
+Where Request.request_id = Dispatch.request_id and
+Request.request_id = Pickup.request_id and
+Dropoff.datetime::timestamp::date = Pickup.datetime::timestamp::date
+Group by driver_id, dispatch.request_id
+Having count(Dropoff.request_id) = 1;
 
-Select * from ActualBreakTime;
+--Select * from OneTripBreak;
 
 
+CREATE VIEW ActualBreakTime  as
+(Select * From OneTripBreak)
+UNION
+(Select * From DirverBreakPerDay);
 
-CREATE VIEW TotalDriverBreakPerDay as
-Select request_id, driver_id, 
-sum(Pickup.datetime - Dropoff.datetime) as break
-From DirverBreakSumPerDay
-Where Pickup.request_id != Dropoff.request_id and
-Dropoff.datetime < Pickup.datetime
-Group by request_id, driver_id;
-
-Select * from TotalDriverBreakPerDay;
+--Select * from ActualBreakTime;
 
 
---CREATE VIEW DriverOneTripPerDay as
+CREATE VIEW DriverBreakLawOneDay as
+Select ActualBreakTime.driver_id, 
+       date(DirverWorkTimePerDay.pickuptime) as start, 
+       DirverWorkTimePerDay.worktime as driving, 
+       ActualBreakTime.onebreak as breaks
+From ActualBreakTime, DirverWorkTimePerDay
+Where ActualBreaKTime.driver_id = ActualBreakTime.driver_id and 
+DirverWorkTimePerDay.worktime > interval'12:00:00';
+
+--Select * from DriverBreakLawOneDay;
 
 
-
---CREATE VIEW DriverWorkMoreThree as
-
-
---CREATE VIEW BreakTimeInThreeDay as
-
-
---CREATE VIEW DriveBreakLaw as 
+CREATE VIEW DriverBreakLaw as 
+Select D1.driver_id, 
+       D1.start as start, 
+       D1.driving + D2.driving + D3.driving as driving, 
+       D1.breaks + D2.breaks + D3.breaks as breaks
+From DriverBreakLawOneDay as D1,
+    DriverBreakLawOneDay as D2,
+    DriverBreakLawOneDay as D3
+Where D1.start + 1 = D2.start and D2.start + 1 = D3.start;
 
 -- Your query that answers the question goes below the "insert into" line:
---insert into q3
+insert into q3
+Select * From DriverBreakLaw;
+
+
+
+
+
+
+

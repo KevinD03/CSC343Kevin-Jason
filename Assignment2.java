@@ -107,16 +107,14 @@ public class Assignment2 {
       // Implement this method!
       try {
       	String queryString = "Select Request.request_id " + 
-      		"From Request, Dispatch, Pickup" + 
+      		"From Request, Dispatch" + 
       		"Where Request.request_id = Dispatch.request_id and "
       		+ "Dispatch.request_id = Requset.request_id and "
-      		+ "Dispatch.driver_id = ? and "
-      		+ "Request.client_id = ? and "
-      		+ "Pickup.datetime = ?;";
+      		+ "Dispatch.driver_id = ? "
+      		+ "Request.client_id = ? ";
       	PreparedStatement ps = connection.prepareStatement(queryString);
       	ps.setInt(1, driverID);
       	ps.setInt(2, clientID);
-      	ps.setTimestamp(3, when);
       	ResultSet rs = ps.executeQuery();
       	while (rs.next()) {
       	    int request_id = rs.getInt("request_id");
@@ -290,6 +288,7 @@ public class Assignment2 {
 	      	stat.setObject(3, dpcarlocation.get(k));
 	      	stat.setTimestamp(4, when);
 	      	stat.execute();
+	      	
 	      }
       
       
