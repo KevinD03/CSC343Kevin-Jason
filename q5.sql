@@ -26,16 +26,14 @@ DROP VIEW IF EXISTS Report CASCADE;
 
 CREATE VIEW RequestWithBill as
 Select Request.request_id, 
-concat(extract(year from Request.datetime), ' ', 
-extract(month from Request.datetime)) as datetime, amount
+Request.datetime as datetime, amount
 From Request left join Billed on Request.request_id = Billed.request_id;
 
 --Select * from RequestWithBill;
 
 CREATE VIEW RequsetWithAllBill as
-Select Request.client_id, Request.request_id, 
-concat(extract(year from Request.datetime), ' ', 
-extract(month from Request.datetime)) as datetime, amount
+Select Request.client_id, Request.request_id, Request.datetime 
+as datetime, amount
 From Request,RequestWithBill
 Where Request.request_id = RequestWithBill.request_id;
 
@@ -43,8 +41,7 @@ Where Request.request_id = RequestWithBill.request_id;
 
 
 CREATE VIEW MonthAverage as
-Select Request.client_id, concat(extract(year from Request.datetime), ' ', 
-extract(month from Request.datetime)) as datetime, 
+Select Request.client_id, Request.datetime as datetime, 
 avg(Billed.amount) as average
 From Request, Billed
 Where Request.request_id = Billed.request_id
@@ -54,9 +51,7 @@ Group by Request.client_id,datetime;
 
 
 CREATE VIEW ClientAndMonth as
-Select Client.client_id, Request.request_id,
-concat(extract(year from Request.datetime), ' ', 
-extract(month from Request.datetime)) as datetime
+Select Client.client_id, Request.request_id, Request.datetime as datetime
 From Client, Request
 Order by Client.client_id;
 
@@ -93,7 +88,8 @@ Order By ClientMonthCheck.client_id;
 
 CREATE VIEW Report as 
 Select Distinct ClientMonthBill.client_id, 
-ClientMonthBill.datetime as month,
+concat(extract(year from ClientMonthBill.datetime), ' ',
+extract(month from ClientMonthBill.datetime)) as month,
 total,
     Case
          When total < average Then 'below'
@@ -105,5 +101,5 @@ where ClientMonthBill.datetime = MonthAverage.datetime;
 --Select * from Report;
 
 -- Your query that answers the question goes below the "insert into" line:
-insert into q5
+--insert into q5
 Select * from Report;
