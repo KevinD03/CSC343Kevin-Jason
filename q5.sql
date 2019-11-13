@@ -26,14 +26,40 @@ DROP VIEW IF EXISTS Report CASCADE;
 
 CREATE VIEW RequestWithBill as
 Select Request.request_id, 
-Request.datetime as datetime, amount
+-- Bigger and smaller spenders
+
+-- You must not change the next 2 lines or the table definition.
+SET SEARCH_PATH TO uber, public;
+drop table if exists q5 cascade;
+
+create table q5(
+	client_id INTEGER,
+	months VARCHAR(7),      -- The handout called this "month", which made more sense.
+	total FLOAT,
+	comparison VARCHAR(30)  -- This could have been lower.
+);
+
+-- Do this for each of the views that define your intermediate steps.  
+-- (But give them better names!) The IF EXISTS avoids generating an error 
+-- the first time this file is imported.
+DROP VIEW IF EXISTS RequestWithBill CASCADE;
+DROP VIEW IF EXISTS RequsetWithAllBill CASCADE;
+DROP VIEW IF EXISTS MonthAverage CASCADE;
+DROP VIEW IF EXISTS ClientAndMonth CASCADE;
+DROP VIEW IF EXISTS ClientMonthComb CASCADE;
+DROP VIEW IF EXISTS ClientMonthCheck CASCADE;
+DROP VIEW IF EXISTS ClientMonthBill CASCADE;
+DROP VIEW IF EXISTS Report CASCADE;
+-- Define views for your intermediate steps here:
+
+CREATE VIEW RequestWithBill as
+Select Request.request_id, to_char(Request.datetime, 'YYYY-MM') as datetime, amount
 From Request left join Billed on Request.request_id = Billed.request_id;
 
 --Select * from RequestWithBill;
 
 CREATE VIEW RequsetWithAllBill as
-Select Request.client_id, Request.request_id, Request.datetime 
-as datetime, amount
+Select Request.client_id, Request.request_id, to_char(Request.datetime, 'YYYY-MM') as datetime, amount
 From Request,RequestWithBill
 Where Request.request_id = RequestWithBill.request_id;
 
@@ -41,7 +67,7 @@ Where Request.request_id = RequestWithBill.request_id;
 
 
 CREATE VIEW MonthAverage as
-Select Request.client_id, Request.datetime as datetime, 
+Select Request.client_id, to_char(Request.datetime, 'YYYY-MM') as datetime, 
 avg(Billed.amount) as average
 From Request, Billed
 Where Request.request_id = Billed.request_id
@@ -51,7 +77,7 @@ Group by Request.client_id,datetime;
 
 
 CREATE VIEW ClientAndMonth as
-Select Client.client_id, Request.request_id, Request.datetime as datetime
+Select Client.client_id, Request.request_id, to_char(Request.datetime, 'YYYY-MM') as datetime
 From Client, Request
 Order by Client.client_id;
 
@@ -88,8 +114,8 @@ Order By ClientMonthCheck.client_id;
 
 CREATE VIEW Report as 
 Select Distinct ClientMonthBill.client_id, 
-concat(extract(year from ClientMonthBill.datetime), ' ',
-extract(month from ClientMonthBill.datetime)) as month,
+concat(SUBSTRING(ClientMonthBill.datetime, 1, 4),
+' ',SUBSTRING(ClientMonthBill.datetime, 6,2)) as month,
 total,
     Case
          When total < average Then 'below'
