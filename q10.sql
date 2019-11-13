@@ -67,15 +67,20 @@ GROUP BY driver_id, to_char(Request.datetime, 'MM');
 
 CREATE VIEW Final AS
 SELECT DriverMonths.driver_id as driver_id, DriverMonths.month 
-as month, coalesce(mileage_2014,0) as mileage_2014, coalesce(billings_2014,0) as billings_2014,
- coalesce(mileage_2015,0) as mileage_2015, coalesce(billings_2015,0) as billings_2015
+as month, coalesce(mileage_2014,0) as mileage_2014, coalesce(billings_2014,0) 
+as billings_2014,
+ coalesce(mileage_2015,0) as mileage_2015, coalesce(billings_2015,0) 
+ as billings_2015
 FROM (DriverMonths LEFT JOIN MileageBillings2014 ON DriverMonths.driver_id = 
-MileageBillings2014.driver_id and DriverMonths.month = MileageBillings2014.month)
+MileageBillings2014.driver_id 
+and DriverMonths.month = MileageBillings2014.month)
 LEFT JOIN MileageBillings2015 ON DriverMonths.driver_id = 
-MileageBillings2015.driver_id and DriverMonths.month = MileageBillings2015.month;
+MileageBillings2015.driver_id 
+and DriverMonths.month = MileageBillings2015.month;
 
 CREATE VIEW Result AS
-SELECT driver_id, month, mileage_2014, billings_2014, mileage_2015, billings_2015, 
+SELECT driver_id, month, mileage_2014, billings_2014, 
+mileage_2015, billings_2015, 
 billings_2015 - billings_2014 as billings_increase, 
 mileage_2015 - mileage_2014 as mileage_increase
 FROM Final;

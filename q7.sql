@@ -17,7 +17,8 @@ create table q7(
 -- (But give them better names!) The IF EXISTS avoids generating an error 
 -- the first time this file is imported.
 DROP VIEW IF EXISTS AllDriver CASCADE;
-
+DROP VIEW IF EXISTS AllDriverRating CASCADE;
+DROP VIEW IF EXISTS AllDriverRatingWithNull CASCADE;
 
 -- Define views for your intermediate steps here:
 CREATE VIEW AllDriver as 

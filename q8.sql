@@ -19,7 +19,8 @@ DROP VIEW IF EXISTS Final CASCADE;
 
 -- Define views for your intermediate steps here:
 CREATE VIEW Reciprocal AS
-SELECT driverrating.request_id as request_id, driverrating.rating as driverrating, clientrating.rating as clientrating
+SELECT driverrating.request_id as request_id, driverrating.rating as 
+driverrating, clientrating.rating as clientrating
 FROM driverrating, clientrating
 WHERE driverrating.request_id = clientrating.request_id;
 
@@ -28,7 +29,8 @@ SELECT client_id, driverrating, clientrating
 FROM Reciprocal JOIN Request ON Request.request_id = Reciprocal.request_id;
 
 CREATE VIEW Final AS
-SELECT client_id, count(driverrating) as reciprocals, avg(driverrating - clientrating) as difference
+SELECT client_id, count(driverrating) as reciprocals, 
+avg(driverrating - clientrating) as difference
 FROM ReciprocalClient
 GROUP BY client_id;
 

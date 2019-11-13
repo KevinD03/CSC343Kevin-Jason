@@ -6,7 +6,8 @@ drop table if exists q5 cascade;
 
 create table q5(
 	client_id INTEGER,
-	months VARCHAR(7),      -- The handout called this "month", which made more sense.
+	months VARCHAR(7),      -- The handout called this "month", 
+				-- which made more sense.
 	total FLOAT,
 	comparison VARCHAR(30)  -- This could have been lower.
 );

@@ -41,7 +41,8 @@ SELECT YearWithRidesConsiderAllClients.year as year,
 YearWithRidesConsiderAllClients.client_id 
 as client_id, DropoffFormat.request_id as request_id
 FROM (DropoffFormat JOIN Request ON DropoffFormat.request_id 
-= Request.request_id) RIGHT JOIN YearWithRidesConsiderAllClients ON YearWithRidesConsiderAllClients.client_id 
+= Request.request_id) RIGHT JOIN YearWithRidesConsiderAllClients ON 
+YearWithRidesConsiderAllClients.client_id 
 = Request.client_id AND YearWithRidesConsiderAllClients.year 
 = DropoffFormat.year;
 

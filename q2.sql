@@ -21,6 +21,7 @@ DROP VIEW IF EXISTS ClientRideNum CASCADE;
 DROP VIEW IF EXISTS ClientOneToTenIn2014 CASCADE;
 DROP VIEW IF EXISTS ClientNumIn2015 CASCADE;
 DROP VIEW IF EXISTS ClientFewerRideIn2015 CASCADE;
+DROP VIEW IF EXISTS Merge CASCADE;
 
 -- Define views for your intermediate steps here:
 CREATE VIEW TotalBillBefore2014 as
@@ -88,7 +89,7 @@ Select ClientFewerRideIn2015.client_id, surname, firstname, email, billed
 From ClientFewerRideIn2015,TotalBillBefore2014
 Where ClientFewerRideIn2015.client_id = TotalBillBefore2014.client_id;
 
-Select * From Merge; 
+-- Select * From Merge; 
 
 
 -- Your query that answers the question goes below the "insert into" line:

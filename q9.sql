@@ -21,7 +21,8 @@ DROP VIEW IF EXISTS Final CASCADE;
 CREATE VIEW Raters AS
 SELECT client_id, driver_id, rating
 FROM Dropoff JOIN Dispatch ON Dropoff.request_id = Dispatch.request_id
-JOIN Request ON Request.request_id = Dropoff.request_id JOIN driverrating ON driverrating.request_id = Dropoff.request_id;
+JOIN Request ON Request.request_id = Dropoff.request_id JOIN driverrating 
+ON driverrating.request_id = Dropoff.request_id;
 
 CREATE VIEW InconsistentRaters AS
 SELECT client_id
@@ -34,7 +35,8 @@ CREATE VIEW ConsistentRaters AS
 
 CREATE VIEW Final AS
 SELECT client.client_id as client_id, email
-FROM ConsistentRaters JOIN client ON client.client_id = ConsistentRaters.client_id;
+FROM ConsistentRaters JOIN client ON client.client_id = 
+ConsistentRaters.client_id;
 
 -- Your query that answers the question goes below the "insert into" line:
 insert into q9
