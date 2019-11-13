@@ -2,6 +2,7 @@ import java.sql.*;
 // You should use this class so that you can represent SQL points as
 // Java PGpoint objects.
 import org.postgresql.geometric.PGpoint;
+import java.util.ArrayList;
 
 public class Assignment2 {
 
@@ -221,8 +222,8 @@ public class Assignment2 {
 	      ArrayList<PGpoint> driverlocation = new ArrayList<PGpoint>();
 	      
 	      while (worths0.next()) {
-	      	driverid.add(worths.getInt("driver_id"));
-	      	PGpoint pg = (PGpoint)worths.getObject("location");
+	      	driverid.add(worths0.getInt("driver_id"));
+	      	PGpoint pg = (PGpoint)worths0.getObject("location");
 	      	driverlocation.add(pg);
 	      }
 	      
@@ -239,7 +240,7 @@ public class Assignment2 {
 	      	"AND Available.Place[1] < NWy AND Place.location[1] > " +
 	      	"SEy" +
 	      	"ORDER BY billings DESC;";
-	      PreparedStatement stat = connection.prepareStatement(query3);     
+	      stat = connection.prepareStatement(query3);     
 	      ResultSet worths3 = stat.executeQuery();
 	      System.out.println("Client location");
 	      
@@ -247,7 +248,7 @@ public class Assignment2 {
 	      ArrayList<Integer> clientid = new ArrayList<Integer>();
 	      ArrayList<PGpoint> clientlocation = new ArrayList<PGpoint>();
 	      
-	      while (worths3) {
+	      while (worths3.next()) {
 	      	PGpoint pg = (PGpoint) worths3.getObject("location");
 	      	clientlocation.add(pg);
 	      	requestid.add(worths3.getInt("request_id"));
@@ -259,15 +260,15 @@ public class Assignment2 {
 	      ArrayList<PGpoint> dpcarlocation = new ArrayList<PGpoint>();
 	      
 	      for (int i = 0; i < requestid.size(); i++) {
-	      	if (driverid.size()) == 0){
+	      	if (driverid.size() == 0){
 	      		break;
 	      	}
-	      	int distance = Integer.MAX_VALUE;
+	      	Double distance = Double.MAX_VALUE;
 	      	int index = 0;
 	      	for (int j = 0; j < driverid.size(); j++) {
 	      		double distancecad = Math.sqrt(
 	      		(clientlocation.get(i).x - driverlocation.get(j).x) 
-	      		* (clientlocation.get(i).x - driverlocation.get(j).x
+	      		* (clientlocation.get(i).x - driverlocation.get(j).x)
 	      		+ (clientlocation.get(i).y - driverlocation.get(j).y) *
 	      		(clientlocation.get(i).y - driverlocation.get(j).y));
 	      		if (distancecad < distance) {
@@ -281,15 +282,14 @@ public class Assignment2 {
 	      	
 	      }
 	      for (int k = 0; k < dprequestid.size(); k++) {
-	      	query4 = "INSERT INTO Dispatch (request_id, driver_id, " + 
-	      	"car_location, datetime) " +
-	      	"VALUES(?, ?, ?, ?);";
+	      	String query4 = "INSERT INTO Dispatch (request_id, driver_id, " + 
+	      	"car_location, datetime) " + "VALUES(?, ?, ?, ?);";
 	      	stat = connection.prepareStatement(query4);
 	      	stat.setInt(1, dprequestid.get(k));
 	      	stat.setInt(2, dpdriverid.get(k));
 	      	stat.setObject(3, dpcarlocation.get(k));
 	      	stat.setTimestamp(4, when);
-	      	stat.execute;
+	      	stat.execute();
 	      }
       
       

@@ -6,9 +6,7 @@ insert into client values
 
 insert into driver values
 (12345, 'Snow', 'Jon', 'January 1, 1990', 'The Wall', 'BGSW 420', false),
-(22222, 'Tyrion', 'Lannister', 'January 1, 1990', 'Kings Landing', 'ABCD 123', false), 
-
-(22223, 'Jason', 'Lin', 'January 2, 1990', 'UOFT', 'ABCD 143', true);
+(22222, 'Tyrion', 'Lannister', 'January 1, 1990', 'Kings Landing', 'ABCD 123', false);
 
 
 insert into available values
@@ -37,12 +35,7 @@ insert into request values
 (6, 100, '2014-07-02 08:00', 'pearson international airport', 'eaton centre'),
 (7, 100, '2014-07-03 08:00', 'eaton centre', 'cn tower'),
 -- 2015
-(8, 100, '2015-07-01 08:00', 'cn tower', 'pearson international airport'),
-
-(9, 100, '2015-07-05 08:00', 'cn tower', 'pearson international airport'),
-(10, 100, '2015-07-09 08:00', 'cn tower', 'pearson international airport'),
-(11, 100, '2015-07-10 08:00', 'cn tower', 'pearson international airport'),
-(12, 100, '2015-07-12 08:00', 'cn tower', 'pearson international airport');
+(8, 100, '2015-07-01 08:00', 'cn tower', 'pearson international airport');
 
 
 insert into dispatch values
@@ -53,12 +46,7 @@ insert into dispatch values
 (5, 22222, '(5, 5)', '2014-07-01 08:05'),
 (6, 22222, '(5, 5)', '2014-07-02 08:05'),
 (7, 22222, '(5, 5)', '2014-07-03 08:05'),
-(8, 22222, '(5, 5)', '2015-07-01 08:05'),
-
-(9, 22222, '(5, 5)', '2015-07-05 08:05'),
-(10, 22222, '(5, 5)', '2015-07-09 08:05'),
-(11, 22222, '(5, 5)', '2015-07-10 08:05'),
-(12, 22222, '(5, 5)', '2015-07-11 08:05');
+(8, 22222, '(5, 5)', '2015-07-01 08:05');
 
 
 insert into pickup values
@@ -69,12 +57,7 @@ insert into pickup values
 (5, '2014-07-01 08:06'),
 (6, '2014-07-02 08:06'),
 (7, '2014-07-03 08:06'),
-(8, '2015-07-01 08:06'),
-
-(9, '2015-07-05 08:10'),
-(10,'2015-07-09 08:10'),
-(11,'2015-07-10 08:10'),
-(12,'2015-07-11 08:10');
+(8, '2015-07-01 08:06');
 
 
 insert into dropoff values
@@ -85,12 +68,7 @@ insert into dropoff values
 (5, '2014-07-01 08:16'),
 (6, '2014-07-02 08:16'),
 (7, '2014-07-03 08:16'),
-(8, '2015-07-01 08:16'),
-
-(9, '2015-07-05 08:10'),
-(10,'2015-07-09 08:10'),
-(11,'2015-07-10 08:10'),
-(12,'2015-07-11 08:10');
+(8, '2015-07-01 08:16');
 
 
 insert into rates values
@@ -109,18 +87,7 @@ insert into billed values
 
 
 insert into driverrating values
-(1, 5),
-
-(2, 5),
-(3, 2),
-(4, 1),
-(5, 4),
-(6, 5),
-(7, 4),
-(8, 5),
-(9, 2),
-(10,5),
-(11,5);
+(1, 5);
 
 insert into clientrating values
 (1, 4);
