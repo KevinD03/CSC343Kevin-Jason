@@ -169,6 +169,7 @@ public class Assignment2 {
     */
    public void dispatch(PGpoint NW, PGpoint SE, Timestamp when) {
       // Implement this method!
+    
       try {
 	      Double SEx = SE.x;
 	      Double SEy = SE.y;
