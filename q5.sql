@@ -102,5 +102,5 @@ where ClientMonthBill.datetime = MonthAverage.datetime;
 --Select * from Report;
 
 -- Your query that answers the question goes below the "insert into" line:
---insert into q5
+insert into q5
 Select * from Report;
